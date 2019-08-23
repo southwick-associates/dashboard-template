@@ -12,9 +12,9 @@ run_group <- function(
     cust, lic, sale, yrs = 2008:2018, timeframe = "full-year",
     group = "hunt", lic_types = c("hunt", "combo")
 ) {
-    history <- build_history(cust, lic, sale, yrs, timeframe, lic_types)
-    metrics <- calc_metrics(history) 
-    format_metrics(metrics, timeframe, group)
+    build_history(cust, lic, sale, yrs, timeframe, lic_types) %>%
+        calc_metrics() %>% 
+        format_metrics(timeframe, group)
 }
 
 # 3 Processing Functions --------------------------------------------------
