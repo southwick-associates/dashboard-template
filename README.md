@@ -4,10 +4,14 @@ This workflow includes all code necessary to produce dashboard input (i.e., summ
 
 ## Installation
 
-- R Software
-- `r install.packages(c("dplyr", "data.table"))`
+You'll need a version of [R Software](https://www.r-project.org/) installed (version 3.5.0 or greater). Additionally, 3 packages will be needed:
+
+- dplyr is used directly for this workflow: `install.packages("dplyr")`
+- data.table is used internally by salic: `install.packages("data.table")`
 - install salic
 
 ## Usage
+
+This workflow depends heavily on package salic (vignette link)
 
 Run `source("code/run.R")` from R (ensuring working directory is set to the template folder).
