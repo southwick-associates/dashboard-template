@@ -30,7 +30,8 @@ run_group <- function(
 # - timeframe: time period covered ("full-year" or "mid-year")
 # - lic_types: license types (lic$type) included in permission group
 build_history <- function(
-    cust, lic, sale, yrs = 2008:2018, timeframe = "full-year", lic_types = c("hunt", "combo")
+    cust, lic, sale, yrs = 2008:2018, timeframe = "full-year", 
+    lic_types = c("hunt", "combo")
 ) {
     first_month = if (timeframe == "mid-year") TRUE else FALSE
     carry_vars = if (timeframe == "mid-year") c("month", "res") else "res"
@@ -42,7 +43,10 @@ build_history <- function(
         rank_sale(first_month = first_month) %>%
         make_history(yrs, carry_vars, yrs_lapse) %>%
         left_join(cust, by = "cust_id")
-    if (timeframe == "mid-year") history <- filter(history, month <= 6)
+    
+    if (timeframe == "mid-year") {
+        history <- filter(history, month <= 6)
+    }
     history
 }
 
@@ -70,10 +74,10 @@ calc_metrics <- function(
     part <- sapply2(segs, function(x) est_part(history, x, tests[x]))
     participants <- lapply(part, function(x) scaleup_part(x, part$tot, scaleup_test))
     
-    if ("lapse" %in% colnames(history)) {
+    if ("lapse" %in% names(history)) {
         churn <- sapply2(segs, function(x) est_churn(history, x, tests[x]))
     }
-    if ("R3" %in% colnames(history)) {
+    if ("R3" %in% names(history)) {
         history <- filter(history, R3 == "Recruit")
         part <- sapply2(segs, function(x) est_recruit(history, x, tests[x]))
         recruits <- lapply(part, function(x) scaleup_recruit(x, part$tot, scaleup_test))
