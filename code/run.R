@@ -28,4 +28,6 @@ all_sports <- run_group(
 # combine permissions & save output to CSV
 dashboard <- bind_rows(all_sports, fish, hunt)
 outfile <- file.path("out", paste0(timeframe, yrs[length(yrs)], ".csv"))
+
+dir.create("out", showWarnings = FALSE)
 write.csv(dashboard, file = outfile, row.names = FALSE)

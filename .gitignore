@@ -5,3 +5,4 @@
 .Rprofile
 dashboard-template.Rproj
 /out/*
+.gitignore

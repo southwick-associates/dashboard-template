@@ -1,17 +1,13 @@
 # A template for preparing agency dashboard data
 
-This workflow includes all code necessary to produce dashboard input (i.e., summary data) from standardized license data for your state (using R). It was prepared by Southwick Associates to aid state agencies in AFWA's National/Regional dashboard effort. Simply download (or clone) this repository to utilize the template for your state's data.
+This workflow includes all code necessary to produce dashboard input (i.e., summary data) from standardized license data for your state (using R). It was prepared by Southwick Associates to aid state agencies in AFWA's National/Regional dashboard effort.
 
 ## Installation
 
-You'll need a version of [R Software](https://www.r-project.org/) installed (version 3.5.0 or greater). Additionally, 3 packages will be needed:
-
-- dplyr is used directly for this workflow: `install.packages("dplyr")`
-- data.table is used internally by salic: `install.packages("data.table")`
-- install salic
+Install [R package salic](https://southwick-associates.github.io/salic/) and then download this repository.
 
 ## Usage
 
-This workflow depends heavily on package salic (vignette link)
+See (vignette link) for an introduction to the workfow. For production, run `source("code/run.R")` from the console. This will save a CSV file to an "out" folder.
 
-Run `source("code/run.R")` from R (ensuring working directory is set to the template folder).
+Note that sample data is used by default, you'll need to edit "code/run.R" to specify your state's data and set the "yrs" and "timeframe" parameters.  
