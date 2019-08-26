@@ -8,6 +8,6 @@ Install [R package salic](https://southwick-associates.github.io/salic/) and the
 
 ## Usage
 
-See (vignette link) for an introduction to the workfow. For production, run `source("code/run.R")` from the console. This will save a CSV file to an "out" folder.
+See [the salic vignette](https://southwick-associates.github.io/salic/articles/salic.html) for an introduction to the workfow. For production, run `source("code/run.R")` from the R console. This will save a CSV file to an "out" folder.
 
-Note that sample data is used by default, you'll need to edit "code/run.R" to specify your state's data and set the "yrs" and "timeframe" parameters.  
+Note that sample data is used by default. You'll need to edit "code/run.R" to specify your state's data and set the "yrs" and "timeframe" parameters as necessary.  

@@ -2,7 +2,7 @@
 
 # Process 1 Permission ----------------------------------------------------
 
-# Wrap 3 functions to perform all dashboard processing for a single permission
+# Wrap 3 processing functions to produce a summary table for one permission (i.e., group)
 # - cust, lic, sale: standardized license data frames
 # - yrs: years to include
 # - timeframe: time period covered ("full-year" or "mid-year")
@@ -19,7 +19,7 @@ run_group <- function(
 
 # 3 Processing Functions --------------------------------------------------
 
-# A function for each dashboarding processing step:
+# A function for each dashboard processing step:
 # 1. produce history: build_history()
 # 2. produce metrics: calc_metrics()
 # 3. format for dashboard: format_metrics()
