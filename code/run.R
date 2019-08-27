@@ -25,7 +25,7 @@ all_sports <- run_group(
     cust, lic, sale, yrs, timeframe, "all_sports", c("hunt", "fish", "combo")
 )
 
-# combine permission summaries & save output to CSV
+# combine permission summaries and save output to CSV
 dashboard <- bind_rows(all_sports, fish, hunt)
 
 outfile <- file.path(

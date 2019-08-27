@@ -1,4 +1,4 @@
-# functions to automate dashboard workflow
+# functions to automate summary data production
 
 # Process 1 Permission ----------------------------------------------------
 
