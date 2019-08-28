@@ -14,9 +14,9 @@ Note that sample data is used by default. You'll need to edit "code/run.R" to sp
 
 ### Threshold Tests
 
-**Warnings**: Running on the sample data will produce several threshold warning messages since certain segments (e.g., nonresidents) vary quite a bit year-to-year. I included these threshold checks because large changes can sometimes indicate data problems. You can adjust thresholds using the "tests" argument in calc_metrics() ("code/functions.R") to suit your needs.
+**Warnings**: Running on the sample data will produce several threshold warning messages because certain segments (e.g., nonresidents) vary quite a bit year-to-year. I included these threshold checks because large changes can sometimes indicate data problems. You can adjust thresholds using the "tests" argument in calc_metrics() ("code/functions.R") to suit your needs.
 
-**Errors**: By default, the script will stop with an error if any segment (res, sex, agecat) contains missing values that account for more than 10% of the total. This test is included since a high missing percentage reduces the accuracy of corresponding metrics. You can adjust the threshold using the "scaleup_test" argument in calc_metrics() if you want to prevent a particular error.
+**Errors**: By default, the script will stop with an error if any segment (res, sex, agecat) contains missing values that account for more than 10% of the total (High missing percentages reduce the accuracy of corresponding metrics). You can adjust the threshold using the "scaleup_test" argument in calc_metrics() to prevent a particular error.
 
 ### System Requirements
 
