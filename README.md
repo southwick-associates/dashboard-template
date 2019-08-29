@@ -12,7 +12,12 @@ Large R data files can use up quite a bit of memory, so you may need to watch yo
 
 ## Usage
 
-See [the salic vignette](https://southwick-associates.github.io/salic/articles/salic.html) for an introduction to the workfow. For production, run `source("code/run.R")` from the R console. This will save a CSV file to an "out" folder.
+See the [salic vignette](https://southwick-associates.github.io/salic/articles/salic.html) for an introduction to the workfow. For production, run from the R console:
+
+``` r
+# run results & save to csv
+source("code/run.R")
+```
 
 Note that sample data is used by default. You'll need to edit "code/run.R" to specify your state's data and set the "yrs" and "timeframe" parameters as needed. Running on the sample data should only take a few seconds, but running on production data may take a few minutes.
 
