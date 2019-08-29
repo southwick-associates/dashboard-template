@@ -7,6 +7,9 @@ source("functions.R")
 
 indir <- "../out"
 infiles <- list.files(indir)
+if (length(infiles) == 0) {
+    stop("You need to first generate results: source('code/run.R')", call. = FALSE)
+}
 permissions <- c("hunt", "fish", "all_sports")
 
 # user interface
