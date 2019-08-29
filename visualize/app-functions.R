@@ -72,7 +72,12 @@ run_visual <- function(indir = "out", groups = c("hunt", "fish", "all_sports")) 
                 mutate(metric = factor(metric, levels = c("participants", "recruits", "churn")))
         })
         dataGroup <- reactive({
-            filter(dataFile(), group == input$group)
+            x <- filter(dataFile(), group == input$group)
+            if (nrow(x) == 0) {
+                stop("The '", input$file, "' file doesn't have any rows for the '",
+                     input$group, "' group.", call. = FALSE)
+            }
+            x
         })
         output$allPlot <- renderPlot({
             plot_segment(dataGroup(), "all", "Overall")
