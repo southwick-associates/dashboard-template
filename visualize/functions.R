@@ -1,8 +1,9 @@
 
 # bar plot: value per year for a given segment
 # (facetted by metric & category)
-plot_segment <- function(tbl, caption = "") {
-    ggplot(tbl, aes(year, value, fill = metric)) +
+plot_segment <- function(tbl, seg, caption = "") {
+    filter(tbl, segment == seg) %>%
+        ggplot(aes(year, value, fill = metric)) +
         geom_col() +
         facet_grid(metric ~ category, scales = "free_y") +
         scale_y_continuous(label = scales::comma) +
