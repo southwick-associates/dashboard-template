@@ -1,4 +1,4 @@
-# shiny app functions for visualizing results
+# functions for visualizing results in a shiny app
 
 library(shiny)
 library(dplyr)
@@ -23,10 +23,11 @@ plot_segment <- function(df, seg, plot_title = "") {
 }
 
 # run the shiny app
-# - indir: folder that holds summary results
+# - indir: folder that holds summary results (in csv files)
 # - groups: permission groups to visualize
 run_visual <- function(indir = "out", groups = c("hunt", "fish", "all_sports")) {
     
+    # setup
     infiles <- list.files(indir)
     infiles <- infiles[grep(".csv", infiles)] # only want csv files
     
@@ -41,24 +42,16 @@ run_visual <- function(indir = "out", groups = c("hunt", "fish", "all_sports")) 
     # define user interface
     ui <- fluidPage(sidebarLayout(
         sidebarPanel(
-            selectInput(
-                "file", "Choose Results File", 
-                infiles, selected = infiles[1]
-            ),
-            selectInput(
-                "group", "Choose Permission Group",  
-                groups, selected = groups[1]
-            )
+            selectInput("file", "Choose Results File", infiles),
+            selectInput("group", "Choose Permission Group", groups)
         ),
         mainPanel(
             splitLayout(
-                plotOutput("allPlot"), 
-                plotOutput("agePlot"),
+                plotOutput("allPlot"), plotOutput("agePlot"), 
                 cellWidths = c("35%", "65%")
             ),
             splitLayout(
-                plotOutput("resPlot"),
-                plotOutput("genderPlot")
+                plotOutput("resPlot"), plotOutput("genderPlot")
             ),
             width = 12
         )
@@ -68,8 +61,7 @@ run_visual <- function(indir = "out", groups = c("hunt", "fish", "all_sports")) 
     server <- function(input, output) {
         dataFile <- reactive({
             x <- read.csv(
-                file.path(indir, input$file), 
-                stringsAsFactors = FALSE
+                file.path(indir, input$file), stringsAsFactors = FALSE
             )
             if (!"segment" %in% names(x)) {
                 stop("The '", input$file,  "' file doesn't have a segment column.",
