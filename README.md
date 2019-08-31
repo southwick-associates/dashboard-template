@@ -8,7 +8,7 @@ Install [R package salic](https://southwick-associates.github.io/salic/) and the
 
 ### System Requirements
 
-Large R data files can use up quite a bit of memory, so you may need to watch your RAM usage. As a rule of thumb,  you can probably get by using a computer with 8gb of RAM if you have fewer than 15 million rows in the sale table.
+You may need to watch your RAM usage for production data. As a rule of thumb, a computer with 8gb of RAM should be sufficient if you have fewer than 15 million rows in the sale table.
 
 ## Usage
 
@@ -29,7 +29,7 @@ Note that sample data is used by default. You'll need to edit "code/run.R" to sp
 
 ### Visualize
 
-You can also visualize the results in an interactive window using the shiny package:
+You can visualize the results in an interactive window using the shiny package:
 
 ``` r
 # install dependencies
