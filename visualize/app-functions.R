@@ -40,12 +40,14 @@ run_visual <- function(indir = "out", groups = c("hunt", "fish", "all_sports")) 
     }
     
     # define user interface
-    ui <- fluidPage(sidebarLayout(
-        sidebarPanel(
-            selectInput("file", "Choose Results File", infiles),
-            selectInput("group", "Choose Permission Group", groups)
-        ),
+    ui <- fluidPage(
         mainPanel(
+            splitLayout(
+                selectInput("file", "Choose Results File", infiles),
+                selectInput("group", "Choose Permission Group", groups),
+                # prevent clipping: https://github.com/rstudio/shiny/issues/1531
+                tags$head(tags$style(HTML(".shiny-split-layout > div {overflow: visible;}")))
+            ),
             splitLayout(
                 plotOutput("allPlot"), plotOutput("agePlot"), 
                 cellWidths = c("35%", "65%")
@@ -55,7 +57,7 @@ run_visual <- function(indir = "out", groups = c("hunt", "fish", "all_sports")) 
             ),
             width = 12
         )
-    ))
+    )
     
     # define data selection & plotting
     server <- function(input, output) {
