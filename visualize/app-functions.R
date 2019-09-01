@@ -32,7 +32,10 @@ plot_value <- function(df, seg, plot_title = "", measure = "value") {
 }
 
 # plot % change by year for a given segment
-plot_pct <- function(df, seg, plot_title = "", measure = "pct_change") {
+# - pct_range: y-axis range
+plot_pct <- function(
+    df, seg, plot_title = "", measure = "pct_change", pct_range = 0.5
+) {
     x <- filter(df, segment == seg) %>%
         group_by(group, metric, category) %>%
         arrange(year) %>%
@@ -42,15 +45,16 @@ plot_pct <- function(df, seg, plot_title = "", measure = "pct_change") {
     x %>%
         plot_bar(plot_title, measure) +
         scale_y_continuous(labels = scales::percent) +
+        coord_cartesian(ylim = c(-pct_range/2, pct_range/2)) +
         geom_hline(yintercept = 0, color = "gray47")
 }
 
 # wrapper function: run either "value" or "pct_change"
-plot_segment <- function(df, seg, plot_title = "", measure) {
+plot_segment <- function(df, seg, plot_title = "", measure, pct_range) {
     if (measure == "value") {
         plot_value(df, seg, plot_title)
     } else {
-        plot_pct(df, seg, plot_title)
+        plot_pct(df, seg, plot_title, pct_range = pct_range)
     }
 }
 
@@ -59,8 +63,10 @@ plot_segment <- function(df, seg, plot_title = "", measure) {
 # run the shiny app
 # - indir: folder that holds summary results (in csv files)
 # - groups: permission groups to visualize
-run_visual <- function(indir = "out", groups = c("hunt", "fish", "all_sports")) {
-    
+# - pct_range: y-axis range for % change per year
+run_visual <- function(
+    indir = "out", groups = c("hunt", "fish", "all_sports"), pct_range = 0.5
+) {
     # setup
     infiles <- list.files(indir)
     infiles <- infiles[grep(".csv", infiles)] # only want csv files
@@ -90,7 +96,7 @@ run_visual <- function(indir = "out", groups = c("hunt", "fish", "all_sports")) 
             cellWidths = c("35%", "65%")
         ),
         splitLayout(
-            plotOutput("resPlot"), plotOutput("genderPlot")
+            plotOutput("residencyPlot"), plotOutput("genderPlot")
         ),
         width = 12
     ))
@@ -119,18 +125,18 @@ run_visual <- function(indir = "out", groups = c("hunt", "fish", "all_sports")) 
             }
             x
         })
-        output$allPlot <- renderPlot({
-            plot_segment(dataGroup(), "all", "Overall", input$measure)
-        })
-        output$resPlot <- renderPlot({
-            plot_segment(dataGroup(), "residency", "By Residency", input$measure)
-        })
-        output$genderPlot <- renderPlot({
-            plot_segment(dataGroup(), "gender", "By Gender", input$measure)
-        })
-        output$agePlot <- renderPlot({
-            plot_segment(dataGroup(), "age", "By Age", input$measure)
-        })
+        output$allPlot <- renderPlot({ plot_segment(
+            dataGroup(), "all", "Overall", input$measure, pct_range
+        )})
+        output$residencyPlot <- renderPlot({ plot_segment(
+            dataGroup(), "residency", "By Residency", input$measure, pct_range 
+        )})
+        output$genderPlot <- renderPlot({ plot_segment(
+            dataGroup(), "gender", "By Gender", input$measure, pct_range 
+        )})
+        output$agePlot <- renderPlot({ plot_segment(
+            dataGroup(), "age", "By Age", input$measure, pct_range 
+        )})
     }
     shinyApp(ui, server)
 }
