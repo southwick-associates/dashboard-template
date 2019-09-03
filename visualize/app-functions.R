@@ -64,10 +64,8 @@ plot_segment <- function(df, seg, plot_title = "", measure, pct_range) {
 # - indir: folder that holds summary results (in csv files)
 # - groups: permission groups to visualize
 # - pct_range: y-axis range for % change per year
-# - metrics: metrics to include in summary
 run_visual <- function(
-    indir = "out", groups = c("hunt", "fish", "all_sports"), pct_range = 0.5,
-    metrics = c("participants", "recruits", "churn")
+    indir = "out", groups = c("hunt", "fish", "all_sports"), pct_range = 0.5
 ) {
     # setup
     infiles <- list.files(indir)
@@ -113,9 +111,7 @@ run_visual <- function(
                 stop("The '", input$file,  "' file doesn't have a segment column.",
                      call. = FALSE)
             }
-            x %>%
-                mutate_at(vars(segment, category, metric), "tolower") %>%
-                mutate(metric = factor( metric, levels = metrics ))
+            mutate_at(x, vars(segment, category, metric), "tolower")
         })
         dataGroup <- reactive({
             x <- filter(dataFile(), group == input$group)
