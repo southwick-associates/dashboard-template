@@ -29,7 +29,7 @@ Note that sample data is used by default. You'll need to edit "code/run.R" to sp
 
 ### Visualize
 
-You can visualize the results in an interactive window using the shiny package:
+You can visualize the results in an interactive window using the shiny package. This can be helpful for exploring and/or checking the summary results.
 
 ``` r
 # install dependencies
