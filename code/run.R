@@ -14,16 +14,15 @@ timeframe <- "full-year" # full-year or mid-year
 data(cust, lic, sale)
 data_check(cust, lic, sale)
 
-# produce summaries for each permission
-hunt <- run_group(
-    cust, lic, sale, yrs, timeframe, "hunt", c("hunt", "combo")
-)
-fish <- run_group(
-    cust, lic, sale, yrs, timeframe, "fish", c("fish", "combo")
-)
-all_sports <- run_group(
-    cust, lic, sale, yrs, timeframe, "all_sports", c("hunt", "fish", "combo")
-)
+# produce summaries for each permission (group)
+run_group <- function(group, lic_types) {
+    build_history(cust, lic, sale, yrs, timeframe, lic_types) %>%
+        calc_metrics() %>% 
+        format_metrics(timeframe, group)
+}
+hunt <- run_group("hunt", c("hunt", "combo"))
+fish <- run_group("fish", c("fish", "combo"))
+all_sports <- run_group("all_sports", c("hunt", "fish", "combo")) 
 
 # combine permission summaries and save output to CSV
 dashboard <- bind_rows(all_sports, fish, hunt)

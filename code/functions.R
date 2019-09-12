@@ -1,29 +1,5 @@
 # functions to automate summary data production
 
-# Process 1 Permission ----------------------------------------------------
-
-# Wrap 3 processing functions to produce a summary table for one permission (i.e., group)
-# - cust, lic, sale: standardized license data frames
-# - yrs: years to include
-# - timeframe: time period covered ("full-year" or "mid-year")
-# - lic_types: license types (lic$type) included in permission group
-# - group: name of permission group ("fish", "hunt", "all_sports")
-run_group <- function(
-    cust, lic, sale, yrs = 2008:2018, timeframe = "full-year",
-    group = "hunt", lic_types = c("hunt", "combo")
-) {
-    build_history(cust, lic, sale, yrs, timeframe, lic_types) %>%
-        calc_metrics() %>% 
-        format_metrics(timeframe, group)
-}
-
-# 3 Processing Functions --------------------------------------------------
-
-# A function for each dashboard processing step:
-# 1. produce history: build_history()
-# 2. produce metrics: calc_metrics()
-# 3. format for dashboard: format_metrics()
-
 # build license history table, including R3 & lapse (if applicable)
 # - cust, lic, sale: standardized license data frames
 # - yrs: years to include
