@@ -24,11 +24,10 @@ hunt <- run_group("hunt", c("hunt", "combo"))
 fish <- run_group("fish", c("fish", "combo"))
 all_sports <- run_group("all_sports", c("hunt", "fish", "combo")) 
 
-# combine permission summaries and save output to CSV
-dashboard <- bind_rows(all_sports, fish, hunt)
-
+# save output to CSV
 outfile <- file.path(
     "out", paste0(timeframe, yrs[1], "to", yrs[length(yrs)], ".csv")
 )
 dir.create("out", showWarnings = FALSE)
-write.csv(dashboard, file = outfile, row.names = FALSE)
+bind_rows(all_sports, fish, hunt) %>%
+    write.csv(file = outfile, row.names = FALSE)
