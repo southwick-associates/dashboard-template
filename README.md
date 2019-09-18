@@ -36,6 +36,6 @@ You can visualize the results in an interactive window using the shiny package. 
 install.packages(c("shiny", "ggplot2"))
 
 # visualize
-source("visualize/app-functions.R")
+source("R/visualize.R")
 run_visual()
 ```
