@@ -1,15 +1,10 @@
 # functions for visualizing results in a shiny app
 
-# package imports (for Southwick internal use)
-#' @import dplyr shiny ggplot2
-#' @importFrom utils read.csv
-NULL
-
 # Plotting Functions ------------------------------------------------------
 
 #' Make a bar plot: measure by year (facetted using metric & category)
 #' 
-#' This is used as a for plot_value() and plot_pct()
+#' This is used as a generic function in plot_value() and plot_pct()
 #' 
 #' @param df data frame with summary results
 #' @param plot_title caption to show in plot
@@ -95,7 +90,7 @@ run_visual <- function(indir = "out", pct_range = 0.5) {
         stop(
             "The 'indir' folder must contain csv files.", 
             " Have you generated results?\n", 
-            "- Try using: source('code/run.R')", call. = FALSE
+            "- Try using: source('run.R')", call. = FALSE
         )
     }
     

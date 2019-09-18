@@ -1,17 +1,23 @@
-# functions to automate summary data production
+# functions for dashboard production (1 permission & timeframe)
 
-# package imports (for Southwick internal use)
-#' @import dplyr salic
-NULL
-
-#' Build license history table, including R3 & lapse (if applicable)
-# - cust, lic, sale: standardized license data frames
-# - yrs: years to include
-# - timeframe: time period covered ("full-year" or "mid-year")
-# - lic_types: license types (lic$type) included in permission group
+#' Build license history table
+#' 
+#' This function mostly wraps salic::rank_sale() and salic::make_history(),
+#' with logic based on time period and license types included.
+#' 
+#' @param cust,lic,sale standardized license data frames
+#' @param yrs years to include in dashboard
+#' @param timeframe time period covered ("full-year" or "mid-year")
+#' @param lic_types license types (lic$type) included. This should correspond to
+#' a permission group (e.g., c("hunt", "combo") for "hunt" permission).
+#' @family functions for dashboard production
+#' @export
+#' @examples 
+#' library(salic)
+#' data(cust, lic, sale)
+#' build_history(cust, lic, sale, 2008:2018, "full-year", c("hunt", "combo"))
 build_history <- function(
-    cust, lic, sale, yrs = 2008:2018, timeframe = "full-year", 
-    lic_types = c("hunt", "combo")
+    cust, lic, sale, yrs, timeframe, lic_types
 ) {
     first_month = if (timeframe == "mid-year") TRUE else FALSE
     carry_vars = if (timeframe == "mid-year") c("month", "res") else "res"
@@ -30,10 +36,22 @@ build_history <- function(
     history
 }
 
-# calculate dashbord metrics and store the results in a list
-# - history: data frame produced by build_history()
-# - tests: test thresholds for est_part(), est_churn(), est_recruit()
-# - scaleup_test: test_threshold for scaleup_part()
+#' Calculate dashbord metrics
+#' 
+#' This produces all metrics with segment breakouts. It returns a list with one
+#' element for each metric, which in turn has one element for each segment.
+#' 
+#' @param history data frame produced by build_history()
+#' @param tests test thresholds for salic::est_part(), salic::est_churn(), and
+#' salic::est_recruit()
+#' @param scaleup_test test_threshold for salic::scaleup_part()
+#' @family functions for dashboard production
+#' @export
+#' @examples 
+#' library(salic)
+#' data(history)
+#' metrics <- calc_metrics(history)
+#' metrics$participants$tot # overall participation
 calc_metrics <- function(
     history,
     tests = c(tot = 20, res = 35, sex = 35, agecat = 35),
@@ -65,12 +83,22 @@ calc_metrics <- function(
     sapply2(c("participants", "recruits", "churn"), function(x) if (exists(x)) get(x))
 }
 
-# format metrics (list) into a single table output (data frame)
-# - metrics: list produced by calc_metrics()
-# - timeframe: time period covered ("full-year" or "mid-year")
-# - group: name of permission group ("fish", "hunt", "all_sports")
+#' Format metrics (list) into a single data frame
+#' 
+#' This formats the list results of calc_metrics() into a data frame used as 
+#' input to dashboard visualization software.
+#' 
+#' @param metrics list produced by calc_metrics()
+#' @param timeframe time period covered ("full-year" or "mid-year")
+#' @param group name of permission group ("fish", "hunt", "all_sports")
+#' @family functions for dashboard production
+#' @export
+#' @examples 
+#' library(salic)
+#' data(metrics)
+#' format_metrics(metrics, "full-year", "all_sports")
 format_metrics <- function(
-    metrics, timeframe, group = "hunt"
+    metrics, timeframe, group
 ) {
     lapply_format <- function(metric) {
         lapply(metric, function(x) format_result(x, timeframe, group))
