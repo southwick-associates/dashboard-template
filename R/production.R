@@ -65,22 +65,41 @@ calc_metrics <- function(
     # exclude youths/seniors
     history <- filter(history, !agecat %in% c("0-17", "65+"))
     
-    # calculate metrics across 4 segments
+    # define segments & convenience functions
     segs <- c("tot", "res", "sex", "agecat")
-    sapply2 <- function(x, ...) sapply(x, simplify = FALSE, ...) # for convenience
+    sapply2 <- function(x, ...) sapply(x, simplify = FALSE, ...)
     
-    part <- sapply2(segs, function(x) est_part(history, x, tests[x]))
-    participants <- lapply(part, function(x) scaleup_part(x, part$tot, scaleup_test))
+    # participants by segment for overall, residents, or recruits
+    #   This applies est_part() & scaleup_part() across segments. The part_total 
+    #   argument is used to peg residents to already scaled totals (necessary since 
+    #   the res variable may contain missing values).
+    calc_part <- function(history, part_total = NULL, outvar = "participants") {
+        part <- sapply2(segs, function(x) est_part(history, x, tests[x]))
+        if (is.null(part_total)) part_total <- part$tot
+        lapply(part, function(x) scaleup_part(x, part_total, scaleup_test) %>%
+                   rename(!! outvar := participants))
+    } 
     
+    # calculate metrics across 4 segments
+    participants <- calc_part(history)
+    
+    # Southwick will use resident counts in calculating participation rates
+    residents <- calc_part( 
+        history = filter(history, res == "Resident"),  
+        part_total = filter(participants$res, res == "Resident"),  
+        outvar = "residents" 
+    )
+    if ("R3" %in% names(history)) {
+        recruits <- calc_part(
+            history = filter(history, R3 == "Recruit"), 
+            outvar = "recruits"
+        )
+    }
     if ("lapse" %in% names(history)) {
         churn <- sapply2(segs, function(x) est_churn(history, x, tests[x]))
     }
-    if ("R3" %in% names(history)) {
-        history <- filter(history, R3 == "Recruit")
-        part <- sapply2(segs, function(x) est_recruit(history, x, tests[x]))
-        recruits <- lapply(part, function(x) scaleup_recruit(x, part$tot, scaleup_test))
-    }
-    sapply2(c("participants", "recruits", "churn"), function(x) if (exists(x)) get(x))
+    mets <- c("participants", "residents", "recruits", "churn")
+    sapply2(mets, function(x) if (exists(x)) get(x))
 }
 
 #' Format metrics (list) into a single data frame
@@ -105,6 +124,7 @@ format_metrics <- function(
     }
     bind_rows(
         lapply_format(metrics$participants),
+        lapply_format(metrics$residents),
         if ("recruits" %in% names(metrics)) lapply_format(metrics$recruits),
         if ("churn" %in% names(metrics)) lapply_format(metrics$churn)
     )
