@@ -1,6 +1,10 @@
 # functions to automate summary data production
 
-# build license history table, including R3 & lapse (if applicable)
+# package imports (for Southwick internal use)
+#' @import dplyr salic
+NULL
+
+#' Build license history table, including R3 & lapse (if applicable)
 # - cust, lic, sale: standardized license data frames
 # - yrs: years to include
 # - timeframe: time period covered ("full-year" or "mid-year")

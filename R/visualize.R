@@ -1,14 +1,21 @@
 # functions for visualizing results in a shiny app
 
-library(shiny)
-library(dplyr)
-library(ggplot2)
+# package imports (for Southwick internal use)
+#' @import dplyr shiny ggplot2
+#' @importFrom utils read.csv
+NULL
 
 # Plotting Functions ------------------------------------------------------
 
-# make a bar plot: measure by year (facetted using metric & category)
-# - df: data frame with summary results
-# - measure: variable to be plotted on the y axis
+#' Make a bar plot: measure by year (facetted using metric & category)
+#' 
+#' This is used as a for plot_value() and plot_pct()
+#' 
+#' @param df data frame with summary results
+#' @param plot_title caption to show in plot
+#' @param measure variable to be plotted on the y axis
+#' @family functions to run dashboard visualization
+#' @export
 plot_bar <- function(df, plot_title = "", measure = "value") {
     df %>%
         ggplot(aes_string("year", measure, fill = "metric")) +
@@ -23,16 +30,24 @@ plot_bar <- function(df, plot_title = "", measure = "value") {
         ggtitle(plot_title)
 }
 
-# plot value by year for a given segment
-# - seg: segment to include in plot (e.g., "gender")
+#' Plot value by year for a given segment
+#' 
+#' @inheritParams plot_bar
+#' @param seg variable name of segment to include in plot
+#' @family functions to run dashboard visualization
+#' @export
 plot_value <- function(df, seg, plot_title = "", measure = "value") {
     filter(df, segment == seg) %>%
         plot_bar(plot_title, measure) +
-        scale_y_continuous(label = scales::comma)
+        scale_y_continuous(labels = scales::comma)
 }
 
-# plot % change by year for a given segment
-# - pct_range: y-axis range
+#' Plot percent change by year for a given segment
+#' 
+#' @param pct_range y-axis range
+#' @inheritParams plot_value
+#' @family functions to run dashboard visualization
+#' @export
 plot_pct <- function(
     df, seg, plot_title = "", measure = "pct_change", pct_range = 0.5
 ) {
@@ -49,7 +64,12 @@ plot_pct <- function(
         geom_hline(yintercept = 0, color = "gray47")
 }
 
-# wrapper function: run either "value" or "pct_change"
+#' Run either plot_value() or plot_pct() based on measure
+#' 
+#' @inheritParams plot_value
+#' @inheritParams plot_pct
+#' @family functions to run dashboard visualization
+#' @export
 plot_segment <- function(df, seg, plot_title = "", measure, pct_range) {
     if (measure == "value") {
         plot_value(df, seg, plot_title)
@@ -60,13 +80,13 @@ plot_segment <- function(df, seg, plot_title = "", measure, pct_range) {
 
 # Shiny App Function ------------------------------------------------------
 
-# run the shiny app
-# - indir: folder that holds summary results (in csv files)
-# - groups: permission groups to visualize
-# - pct_range: y-axis range for % change per year
-run_visual <- function(
-    indir = "out", groups = c("hunt", "fish", "all_sports"), pct_range = 0.5
-) {
+#' Run shiny app summary of dashboard results
+#' 
+#' @param indir folder that holds summary results (in csv files)
+#' @param pct_range y-axis range for percent change per year
+#' @family functions to run dashboard visualization
+#' @export
+run_visual <- function(indir = "out", pct_range = 0.5) {
     # setup
     infiles <- list.files(indir)
     infiles <- infiles[grep(".csv", infiles)] # only want csv files
@@ -83,7 +103,7 @@ run_visual <- function(
     ui <- fluidPage(mainPanel(
         splitLayout(
             selectInput("file", "Choose Results File", infiles),
-            selectInput("group", "Choose Permission Group", groups),
+            selectInput("group", "Choose Permission Group", "all_sports"),
             selectInput("measure", "Choose Measure", c("value", "pct_change")),
             
             # prevent clipping: https://github.com/rstudio/shiny/issues/1531
@@ -95,14 +115,13 @@ run_visual <- function(
             plotOutput("allPlot"), plotOutput("agePlot"), 
             cellWidths = c("35%", "65%")
         ),
-        splitLayout(
-            plotOutput("residencyPlot"), plotOutput("genderPlot")
-        ),
+        splitLayout(plotOutput("residencyPlot"), plotOutput("genderPlot")),
+        # plotOutput("countyPlot"), 
         width = 12
     ))
     
     # define data selection & plotting
-    server <- function(input, output) {
+    server <- function(input, output, session) {
         dataFile <- reactive({
             x <- read.csv(
                 file.path(indir, input$file), stringsAsFactors = FALSE
@@ -113,6 +132,11 @@ run_visual <- function(
             }
             mutate_at(x, vars(segment, category, metric), "tolower")
         })
+        # available groups to select are pulled from the "group" variable in the dataset
+        observe({
+            updateSelectInput(session, "group", choices = unique(dataFile()$group))
+        })
+        # the data is filtered based on selected group
         dataGroup <- reactive({
             x <- filter(dataFile(), group == input$group)
             if (nrow(x) == 0) {
@@ -121,6 +145,7 @@ run_visual <- function(
             }
             x
         })
+        # plots are created (4 segments) for the selected file, group, measure
         output$allPlot <- renderPlot({ plot_segment(
             dataGroup(), "all", "Overall", input$measure, pct_range
         )})
