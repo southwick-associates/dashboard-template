@@ -1,4 +1,4 @@
-# namespace definitions for Southwick's internal use
+# namespace definitions for Southwick internal use
 
 #' @import salic dplyr shiny ggplot2
 #' @importFrom utils read.csv
