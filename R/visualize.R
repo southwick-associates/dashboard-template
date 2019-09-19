@@ -129,7 +129,7 @@ run_visual <- function(indir = "out", pct_range = 0.5) {
         })
         # available groups to select are pulled from the "group" variable in the dataset
         observe({
-            updateSelectInput(session, "group", choices = unique(dataFile()$group))
+            updateSelectInput(session, "group", choices = sort(unique(dataFile()$group)))
         })
         # the data is filtered based on selected group
         dataGroup <- reactive({
