@@ -1,4 +1,4 @@
-# functions for dashboard production (1 permission & timeframe)
+# functions for producing a dashboard for specified permission-timeframe
 
 #' Build license history table
 #' 
@@ -10,6 +10,7 @@
 #' @param timeframe time period covered ("full-year" or "mid-year")
 #' @param lic_types license types (lic$type) included. This should correspond to
 #' a permission group (e.g., c("hunt", "combo") for "hunt" permission).
+#' 
 #' @family functions for dashboard production
 #' @export
 #' @examples 
@@ -45,6 +46,8 @@ build_history <- function(
 #' @param tests test thresholds for salic::est_part(), salic::est_churn(), and
 #' salic::est_recruit()
 #' @param scaleup_test test_threshold for salic::scaleup_part()
+#' @param segs vector of segments to be summarized
+#' 
 #' @family functions for dashboard production
 #' @export
 #' @examples 
@@ -55,7 +58,8 @@ build_history <- function(
 calc_metrics <- function(
     history,
     tests = c(tot = 20, res = 35, sex = 35, agecat = 35),
-    scaleup_test = 10
+    scaleup_test = 10,
+    segs = c("tot", "res", "sex", "agecat")
 ) {
     # prepare category variables
     history <- history %>%
@@ -65,42 +69,56 @@ calc_metrics <- function(
     # exclude youths/seniors
     history <- filter(history, !agecat %in% c("0-17", "65+"))
     
-    # define segments & convenience functions
-    segs <- c("tot", "res", "sex", "agecat")
-    sapply2 <- function(x, ...) sapply(x, simplify = FALSE, ...)
+    # calculate metrics across segments
+    participants <- calc_participants(history, segs, tests, scaleup_test)
     
-    # participants by segment for overall, residents, or recruits
-    #   This applies est_part() & scaleup_part() across segments. The part_total 
-    #   argument is used to peg residents to already scaled totals (necessary since 
-    #   the res variable may contain missing values).
-    calc_part <- function(history, part_total = NULL, outvar = "participants") {
-        part <- sapply2(segs, function(x) est_part(history, x, tests[x]))
-        if (is.null(part_total)) part_total <- part$tot
-        lapply(part, function(x) scaleup_part(x, part_total, scaleup_test) %>%
-                   rename(!! outvar := participants))
-    } 
-    
-    # calculate metrics across 4 segments
-    participants <- calc_part(history)
-    
-    # Southwick will use resident counts in calculating participation rates
-    residents <- calc_part( 
-        history = filter(history, res == "Resident"),  
-        part_total = filter(participants$res, res == "Resident"),  
-        outvar = "residents" 
+    residents <- filter(history, res == "Resident") %>% 
+        calc_participants(
+            segs, tests, scaleup_test,  
+            part_total = filter(participants$res, res == "Resident"),   
+            outvar = "residents" 
     )
     if ("R3" %in% names(history)) {
-        recruits <- calc_part(
-            history = filter(history, R3 == "Recruit"), 
-            outvar = "recruits"
-        )
+        recruits <- filter(history, R3 == "Recruit") %>%
+            calc_participants(segs, tests, scaleup_test, outvar = "recruits")
     }
     if ("lapse" %in% names(history)) {
-        churn <- sapply2(segs, function(x) est_churn(history, x, tests[x]))
+        churn <- sapply(segs, function(x) est_churn(history, x, tests[x]), 
+                        simplify = FALSE)
     }
+    # combine results by metric into a single output list
     mets <- c("participants", "residents", "recruits", "churn")
-    sapply2(mets, function(x) if (exists(x)) get(x))
+    sapply(mets, function(x) if (exists(x)) get(x), simplify = FALSE)
 }
+
+#' Calculate participants by segment
+#' 
+#' This is to be called from calc_metrics(). It essentially wraps salic::est_part()
+#' and salic::scaleup_part() with some logic to work for participants overall vs. 
+#' residents vs. recruits
+#' 
+#' @param part_total reference data frame for use in calculating recruits. 
+#' This is necessary because resident breakouts need to be pegged to already 
+#' scaled total residents (in case of missing values in res).
+#' @param outvar name to use for output variable that holds the summary value
+#' @inheritParams calc_metrics
+#' 
+#' @family functions for dashboard production
+#' @export
+calc_participants <- function(
+    history, segs, tests, scaleup_test, part_total = NULL, outvar = "participants"
+) {
+    # apply est_part() by segment
+    part <- sapply(segs, function(x) est_part(history, x, tests[x]), 
+                   simplify = FALSE)
+    
+    # apply scaleup_part() by segment
+    if (is.null(part_total)) {
+        part_total <- part$tot # for overall & recruits
+    }
+    part <- lapply(part, function(x) scaleup_part(x, part_total, scaleup_test))
+    lapply(part, function(x) rename(x, !! outvar := participants))
+} 
 
 #' Format metrics (list) into a single data frame
 #' 
@@ -110,6 +128,7 @@ calc_metrics <- function(
 #' @param metrics list produced by calc_metrics()
 #' @param timeframe time period covered ("full-year" or "mid-year")
 #' @param group name of permission group ("fish", "hunt", "all_sports")
+#' 
 #' @family functions for dashboard production
 #' @export
 #' @examples 

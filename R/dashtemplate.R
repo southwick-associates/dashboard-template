@@ -8,6 +8,6 @@ NULL
 if (getRversion() >= "2.15.1") {
     utils::globalVariables(
         c("R3", "agecat", "category", "group", "metric", "month", "pct_change", 
-          "segment", "type", "value", "year", "res")
+          "segment", "type", "value", "year", "res", "participants")
     )
 }
