@@ -23,7 +23,7 @@ Note that sample data is used by default. You'll need to edit "run.R" to specify
 
 ### Threshold Tests
 
-**Warnings**: Running on the sample data will produce several threshold warning messages since certain segments (e.g., nonresidents) vary quite a bit year-to-year. I included these threshold checks because large changes may indicate data problems. You can adjust thresholds using the "tests" argument in calc_metrics() (in "R/production.R") to suit your needs.
+**Warnings**: Running on the sample data will produce several threshold warning messages since certain segments (e.g., nonresidents) vary quite a bit year-to-year. I included these threshold checks because large changes may indicate data problems. You can adjust thresholds using the "tests" argument in calc_metrics() (documented in "R/production.R") to suit your needs.
 
 **Errors**: By default, the script will stop with an error if any segment (res, sex, agecat) contains missing values that account for more than 10% of the total (high missing percentages reduce the accuracy of corresponding metrics). You can adjust the threshold using the "scaleup_test" argument in calc_metrics() to prevent a particular error.
 
@@ -35,10 +35,11 @@ You can visualize the results in an interactive window using the shiny package. 
 # install dependencies
 install.packages(c("shiny", "ggplot2"))
 
-# visualize
-source("R/visualize.R")
+# run shiny visualization
 library(dplyr)
 library(shiny)
 library(ggplot2)
+
+source("R/visualize.R")
 run_visual()
 ```
