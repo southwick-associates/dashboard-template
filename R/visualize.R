@@ -111,7 +111,6 @@ run_visual <- function(indir = "out", pct_range = 0.5) {
             cellWidths = c("35%", "65%")
         ),
         splitLayout(plotOutput("residencyPlot"), plotOutput("genderPlot")),
-        # plotOutput("countyPlot"), 
         width = 12
     ))
     
